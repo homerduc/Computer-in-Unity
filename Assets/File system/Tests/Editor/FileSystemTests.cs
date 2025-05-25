@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using UnityEngine;
 
 public class FileSystemTests
@@ -17,7 +18,7 @@ public class FileSystemTests
     [TearDown]
     public void TearDown()
     {
-        Object.DestroyImmediate(fileSystem.gameObject);
+        UnityEngine.Object.DestroyImmediate(fileSystem.gameObject);
     }
 
     [Test]
@@ -31,6 +32,19 @@ public class FileSystemTests
         Assert.AreEqual(fileSystem.GetElementByPath("root/test folder 1/test folder 2").Name, "test folder 2");
         Assert.AreEqual(fileSystem.GetElementByPath("root/test folder 1/test folder 2/test file 2").Name, "test file 2");
     }
+
+    [Test]
+    public void ValidateAndStripPath()
+    {
+        // "root" should work, but not "root " or " root"
+        Assert.AreEqual(fileSystem.GetElementByPath("root"), fileSystem.Root);
+        Assert.Catch<ArgumentException>(() => fileSystem.GetElementByPath("root "));
+        Assert.Catch<ArgumentException>(() => fileSystem.GetElementByPath(" root"));
+
+        Assert.Catch<ArgumentException>(() => fileSystem.GetElementByPath("notroot/file"));
+        Assert.Catch<ArgumentException>(() => fileSystem.GetElementByPath(""));
+    }
+
 
     [Test]
     public void CreateFile_CheckPath()
@@ -54,7 +68,10 @@ public class FileSystemTests
         fileSystem.CreateFileFromPath("root/test folder 1/test folder 2/test file 1");
         fileSystem.CreateFileFromPath("root/test folder 1/test folder 2/test file 2");
 
+        // "root" folder only has 1 child
         Assert.AreEqual(fileSystem.Root.Children.Count, 1);
+
+        // "test folder 1" only has 1 child
         Folder testFolder2 = (Folder)fileSystem.GetElementByPath("root/test folder 1/");
         Assert.AreEqual(testFolder2.Children.Count, 1);
     }

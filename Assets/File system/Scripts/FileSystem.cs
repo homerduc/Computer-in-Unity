@@ -6,9 +6,10 @@ using UnityEngine;
 public class FileSystem : MonoBehaviour
 {
     public Folder Root { get; private set; } = new Folder("root");
+ 
 
     /// <summary>
-    /// 
+    /// Returns a reference to the FileSystemElement corresponding to the given path. Returns null if not found
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
@@ -16,16 +17,13 @@ public class FileSystem : MonoBehaviour
     /// <exception cref="InvalidOperationException"></exception>
     public FileSystemElement GetElementByPath(string path)
     {
-        string[] pathList = path.Trim('/').Split('/');
+        string[] pathList = ValidateAndSplitPath(path);
 
-        if (string.IsNullOrWhiteSpace(path))
-            throw new ArgumentException("Path cannot be null or empty.", nameof(path));
-        if (pathList[0] != "root")
-            throw new ArgumentException("Path should start with root folder");
-
+        // If path ~= "root"
         if (pathList.Length == 1)
             return Root;
 
+        // Going through all of the folders of the path
         Folder parentFolder = Root;
         for (int i = 1; i < pathList.Length - 1; i++)
         {
@@ -64,12 +62,8 @@ public class FileSystem : MonoBehaviour
     /// <exception cref="InvalidOperationException"></exception>
     public File CreateFileFromPath(string path)
     {
-        string[] pathList = path.Trim('/').Split('/');
+        string[] pathList = ValidateAndSplitPath(path);
 
-        if (string.IsNullOrWhiteSpace(path))
-            throw new ArgumentException("Path cannot be null or empty.", nameof(path));
-        if (pathList[0] != "root")
-            throw new ArgumentException("Path should start with root folder");
         if (pathList.Length < 2)
             throw new ArgumentException("Path cannot be shorter than 2 elements (including root)");
 
@@ -78,7 +72,6 @@ public class FileSystem : MonoBehaviour
         for (int i = 1; i < pathList.Length - 1; i++)
         {
             string elementName = pathList[i];
-
             FileSystemElement currentElement = parentFolder.ElementInFolderByName(elementName);
 
             // The Folder already exists
@@ -117,5 +110,19 @@ public class FileSystem : MonoBehaviour
 
             return newFile;
         }
+    }
+
+
+    private string[] ValidateAndSplitPath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException("Path cannot be null or empty.", nameof(path));
+
+        string[] pathList = path.Trim('/').Split('/');
+        
+        if (pathList[0] != "root")
+            throw new ArgumentException("Path should start with root folder", nameof(path));
+
+        return pathList;
     }
 }
