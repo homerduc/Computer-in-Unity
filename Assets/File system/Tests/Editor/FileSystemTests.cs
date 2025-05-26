@@ -26,11 +26,13 @@ public class FileSystemTests
     {
         fileSystem.CreateFileFromPath("root/test folder 1/test folder 2/test file 1");
         fileSystem.CreateFileFromPath("root/test folder 1/test folder 2/test file 2");
+        fileSystem.CreateFileFromPath("root/test file 1");
 
         Assert.AreEqual(fileSystem.GetElementByPath("root"), fileSystem.Root);
         Assert.AreEqual(fileSystem.GetElementByPath("root/test folder 1").Name, "test folder 1"); 
         Assert.AreEqual(fileSystem.GetElementByPath("root/test folder 1/test folder 2").Name, "test folder 2");
         Assert.AreEqual(fileSystem.GetElementByPath("root/test folder 1/test folder 2/test file 2").Name, "test file 2");
+        Assert.AreEqual(fileSystem.GetElementByPath("root/test file 1").Name, "test file 1");
     }
 
     [Test]
