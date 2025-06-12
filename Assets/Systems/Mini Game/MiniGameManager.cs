@@ -3,22 +3,50 @@ using UnityEngine;
 
 public class MiniGameManager : MonoBehaviour
 {
-    public Dictionary<string, IMiniGame> miniGames = new();
+    public Dictionary<string, IMiniGame> activeMiniGames = new();
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        // Initialize all minigames
+        foreach (var game in activeMiniGames.Values)
+        {
+            game.Initialize();
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        // Update all minigames
+        foreach (var game in activeMiniGames.Values)
+        {
+            game.Update();
+        }
     }
 
-    public void RegisterMiniGame(string id, IMiniGame game)
+    public void RegisterMiniGame(IMiniGame game)
     {
-        miniGames[id] = game;
+        if (activeMiniGames.ContainsKey(game.GameName))
+        {
+            Debug.LogWarning($"Game {game.GameName} already registered!");
+            return;
+        }
+
+        activeMiniGames[game.GameName] = game;
+        game.Initialize();
+    }
+
+    public void UnregisterMiniGame(string gameName)
+    {
+        if (activeMiniGames.ContainsKey(gameName))
+        {
+            activeMiniGames[gameName].Cleanup();
+            activeMiniGames.Remove(gameName);
+        }
+    }
+    
+    public IMiniGame GetMiniGame(string gameName)
+    {
+        activeMiniGames.TryGetValue(gameName, out var game);
+        return game;
     }
 }

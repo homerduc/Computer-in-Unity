@@ -2,9 +2,10 @@ using UnityEngine;
 
 public interface IMiniGame
 {
+    RenderTexture RenderTextureTarget { get; } // Where the game is rendered
     string GameName { get; }
-    RenderTexture RenderTarget { get; } // Where the game is rendered
     void Initialize();
     void Update();
-    void OnInteraction(string action); // Interact with other games/components
+    void Cleanup();
+    void OnInteraction(string message); // Interact with other games/components
 }
